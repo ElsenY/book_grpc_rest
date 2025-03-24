@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package authorpb;
+
+option go_package = "pb/AuthorService";
+
+service Author {
+  rpc RegisterUserAsAuthor (RegisterUserAsAuthorRequest) returns (RegisterUserAsAuthorResponse);
+}
+
+message RegisterUserAsAuthorRequest {
+}
+
+message RegisterUserAsAuthorResponse {
+  string message = 1;
+}

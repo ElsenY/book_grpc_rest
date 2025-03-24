@@ -1,7 +1,7 @@
 package main
 
 import (
-	"UserService/pb"
+	userPb "UserService/pb/UserService"
 	"UserService/services"
 	"database/sql"
 	"fmt"
@@ -14,6 +14,10 @@ import (
 )
 
 func main() {
+
+	// TODO : remove the secret from code!
+	os.Setenv("JWT_SECRET_KEY", "test123")
+
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
@@ -22,7 +26,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	dbConn := InitDb()
 
-	pb.RegisterUserServer(grpcServer, &services.Server{Db: dbConn})
+	userPb.RegisterUserServer(grpcServer, &services.Server{Db: dbConn})
 
 	fmt.Println("🚀 User Service is running on port 50051...")
 	if err := grpcServer.Serve(lis); err != nil {

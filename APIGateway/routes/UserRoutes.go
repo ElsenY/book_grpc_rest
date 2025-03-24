@@ -1,7 +1,7 @@
 package routes
 
 import (
-	userPb "APIGateway/UserService/pb"
+	userPb "APIGateway/pb/UserService"
 	"context"
 	"net/http"
 
@@ -21,17 +21,17 @@ func RegisterUserRoutes(mainRoute *gin.Engine, userConn *grpc.ClientConn) *gin.E
 		client: userClient,
 	}
 
-	mainRoute.GET("/users/:id", userRoute.GetUser)
+	mainRoute.GET("/users/:id", userRoute.GetUserIdByEmail)
 	mainRoute.POST("/users", userRoute.RegisterUser)
 	mainRoute.POST("/login", userRoute.Login)
 
 	return mainRoute
 }
 
-func (ur UserRoute) GetUser(c *gin.Context) {
-	id := c.Param("id")
+func (ur UserRoute) GetUserIdByEmail(c *gin.Context) {
+	email := c.Param("email")
 
-	res, err := ur.client.GetUser(context.Background(), &userPb.GetUserRequest{UserId: id})
+	res, err := ur.client.GetUserIdByEmail(context.Background(), &userPb.GetUserIdByEmailRequest{Email: email})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -39,7 +39,7 @@ func (ur UserRoute) GetUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": res.Message,
+		"id": res.Id,
 	})
 }
 

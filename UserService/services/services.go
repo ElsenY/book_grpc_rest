@@ -1,11 +1,12 @@
 package services
 
 import (
-	"UserService/pb"
+	userPb "UserService/pb/UserService"
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -13,16 +14,16 @@ import (
 )
 
 type Server struct {
-	pb.UnimplementedUserServer
+	userPb.UnimplementedUserServer
 	Db *sql.DB
 }
 
 type Claims struct {
-	Username string `json:"username"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-func (s *Server) RegisterUser(ctx context.Context, req *pb.RegisterUserRequest) (resp *pb.RegisterUserResponse, err error) {
+func (s *Server) RegisterUser(ctx context.Context, req *userPb.RegisterUserRequest) (resp *userPb.RegisterUserResponse, err error) {
 
 	bcryptPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 
@@ -38,14 +39,29 @@ func (s *Server) RegisterUser(ctx context.Context, req *pb.RegisterUserRequest) 
 		return
 	}
 
-	return &pb.RegisterUserResponse{Message: "User created!"}, nil
+	return &userPb.RegisterUserResponse{Message: "User created!"}, nil
 }
 
-func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
-	return &pb.GetUserResponse{Message: "John Doe"}, nil
+func (s *Server) GetUserIdByEmail(ctx context.Context, req *userPb.GetUserIdByEmailRequest) (resp *userPb.GetUserIdByEmailResponse, err error) {
+
+	row := s.Db.QueryRow(GET_USER_ID_BY_EMAIL_QUERY, req.Email)
+
+	var id string
+
+	err = row.Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("No user found with that ID")
+		} else {
+			fmt.Println("There is an error while scanning row", err)
+		}
+		return
+	}
+
+	return &userPb.GetUserIdByEmailResponse{Id: id}, nil
 }
 
-func (s *Server) Login(ctx context.Context, req *pb.LoginRequest) (resp *pb.LoginResponse, err error) {
+func (s *Server) Login(ctx context.Context, req *userPb.LoginRequest) (resp *userPb.LoginResponse, err error) {
 
 	row := s.Db.QueryRow(GET_USER_PASSWORD_BY_EMAIL_QUERY, req.Email)
 
@@ -69,7 +85,7 @@ func (s *Server) Login(ctx context.Context, req *pb.LoginRequest) (resp *pb.Logi
 
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
-		Username: req.Email,
+		Email: req.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -77,14 +93,11 @@ func (s *Server) Login(ctx context.Context, req *pb.LoginRequest) (resp *pb.Logi
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// TODO : remove the secret from code!
-	jwtSecretKey := "test123"
-
-	tokenString, err := token.SignedString([]byte(jwtSecretKey))
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
 
 	if err != nil {
 		return
 	}
 
-	return &pb.LoginResponse{Token: tokenString}, nil
+	return &userPb.LoginResponse{Token: tokenString}, nil
 }

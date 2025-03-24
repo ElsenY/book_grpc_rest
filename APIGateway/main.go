@@ -12,14 +12,25 @@ import (
 func main() {
 	router := gin.Default()
 
-	// Connect to gRPC service
+	// Connect to user service
 	userConn, err := ConnectUserService()
 
 	if err != nil {
 		fmt.Println("failed to connect to user service")
 	}
 
+	defer userConn.Close()
+
+	authorConn, err := ConnectAuthorService()
+
+	if err != nil {
+		fmt.Println("failed to connect to user service")
+	}
+
+	defer userConn.Close()
+
 	routes.RegisterUserRoutes(router, userConn)
+	routes.RegisterAuthorRoute(router, authorConn)
 
 	fmt.Println("API Gateway running on port 8080")
 	router.Run(":8080")
@@ -27,6 +38,12 @@ func main() {
 
 func ConnectUserService() (*grpc.ClientConn, error) {
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	return conn, err
+}
+
+func ConnectAuthorService() (*grpc.ClientConn, error) {
+	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }
