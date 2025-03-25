@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Author_RegisterUserAsAuthor_FullMethodName = "/authorpb.Author/RegisterUserAsAuthor"
+	Author_GetAuthorIdByUserId_FullMethodName  = "/authorpb.Author/GetAuthorIdByUserId"
 )
 
 // AuthorClient is the client API for Author service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorClient interface {
 	RegisterUserAsAuthor(ctx context.Context, in *RegisterUserAsAuthorRequest, opts ...grpc.CallOption) (*RegisterUserAsAuthorResponse, error)
+	GetAuthorIdByUserId(ctx context.Context, in *GetAuthorIdByUserIdRequest, opts ...grpc.CallOption) (*GetAuthorIdByUserIdResponse, error)
 }
 
 type authorClient struct {
@@ -47,11 +49,22 @@ func (c *authorClient) RegisterUserAsAuthor(ctx context.Context, in *RegisterUse
 	return out, nil
 }
 
+func (c *authorClient) GetAuthorIdByUserId(ctx context.Context, in *GetAuthorIdByUserIdRequest, opts ...grpc.CallOption) (*GetAuthorIdByUserIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAuthorIdByUserIdResponse)
+	err := c.cc.Invoke(ctx, Author_GetAuthorIdByUserId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthorServer is the server API for Author service.
 // All implementations must embed UnimplementedAuthorServer
 // for forward compatibility.
 type AuthorServer interface {
 	RegisterUserAsAuthor(context.Context, *RegisterUserAsAuthorRequest) (*RegisterUserAsAuthorResponse, error)
+	GetAuthorIdByUserId(context.Context, *GetAuthorIdByUserIdRequest) (*GetAuthorIdByUserIdResponse, error)
 	mustEmbedUnimplementedAuthorServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedAuthorServer struct{}
 
 func (UnimplementedAuthorServer) RegisterUserAsAuthor(context.Context, *RegisterUserAsAuthorRequest) (*RegisterUserAsAuthorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterUserAsAuthor not implemented")
+}
+func (UnimplementedAuthorServer) GetAuthorIdByUserId(context.Context, *GetAuthorIdByUserIdRequest) (*GetAuthorIdByUserIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAuthorIdByUserId not implemented")
 }
 func (UnimplementedAuthorServer) mustEmbedUnimplementedAuthorServer() {}
 func (UnimplementedAuthorServer) testEmbeddedByValue()                {}
@@ -104,6 +120,24 @@ func _Author_RegisterUserAsAuthor_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Author_GetAuthorIdByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuthorIdByUserIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorServer).GetAuthorIdByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Author_GetAuthorIdByUserId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorServer).GetAuthorIdByUserId(ctx, req.(*GetAuthorIdByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Author_ServiceDesc is the grpc.ServiceDesc for Author service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var Author_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterUserAsAuthor",
 			Handler:    _Author_RegisterUserAsAuthor_Handler,
+		},
+		{
+			MethodName: "GetAuthorIdByUserId",
+			Handler:    _Author_GetAuthorIdByUserId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

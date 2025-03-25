@@ -30,6 +30,7 @@ func RegisterBookRoute(mainRoute *gin.Engine, bookConn *grpc.ClientConn) *gin.En
 	protectedBooks.POST("/", bookRoute.InsertBook)
 	protectedBooks.POST("/borrow-book", bookRoute.BorrowBook)
 	protectedBooks.POST("/return-book", bookRoute.ReturnBook)
+	protectedBooks.PUT("/edit-stock", bookRoute.EditStock)
 
 	return mainRoute
 }
@@ -62,7 +63,7 @@ func (br BookRoute) InsertBook(c *gin.Context) {
 }
 
 func (br BookRoute) BorrowBook(c *gin.Context) {
-	var reqBody bookPb.InsertBookRequest
+	var reqBody bookPb.BorrowBookRequest
 
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -89,7 +90,7 @@ func (br BookRoute) BorrowBook(c *gin.Context) {
 }
 
 func (br BookRoute) ReturnBook(c *gin.Context) {
-	var reqBody bookPb.InsertBookRequest
+	var reqBody bookPb.ReturnBookRequest
 
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -155,5 +156,25 @@ func (br BookRoute) SearchBook(c *gin.Context) {
 		"book_title": res.BookTitle,
 		"stock":      res.Stock,
 		"message":    res.Message,
+	})
+}
+
+func (br BookRoute) EditStock(c *gin.Context) {
+	var reqBody bookPb.EditBookStockRequest
+
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := br.client.EditBookStock(c, &bookPb.EditBookStockRequest{Title: reqBody.Title, Stock: reqBody.Stock})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": res.Message,
 	})
 }

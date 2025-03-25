@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 type AuthorRoute struct {
@@ -26,18 +25,21 @@ func RegisterAuthorRoute(mainRoute *gin.Engine, authorConn *grpc.ClientConn) *gi
 
 	protectedAuthor.Use(middleware.AuthMiddleware())
 
-	protectedAuthor.POST("/author", authorRoute.RegisterUserAsAuthor)
+	protectedAuthor.POST("/", authorRoute.RegisterUserAsAuthor)
 
 	return mainRoute
 }
 
 func (ar *AuthorRoute) RegisterUserAsAuthor(c *gin.Context) {
 
-	token := c.GetHeader("Authorization")
+	email, ok := c.Get("email")
 
-	ctx := metadata.AppendToOutgoingContext(c, "authorization", token)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no email attached"})
+		return
+	}
 
-	resp, err := ar.client.RegisterUserAsAuthor(ctx, &authorPb.RegisterUserAsAuthorRequest{})
+	resp, err := ar.client.RegisterUserAsAuthor(c, &authorPb.RegisterUserAsAuthorRequest{UserEmail: email.(string)})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

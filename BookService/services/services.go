@@ -118,6 +118,20 @@ func (s *Server) ReturnBook(ctx context.Context, req *bookPb.ReturnBookRequest) 
 		return
 	}
 
+	var returnDate string
+	row = s.Db.QueryRow(CHECK_BOOK_RETURNED_QUERY, userResp.Id, bookId)
+
+	err = row.Scan(&returnDate)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if returnDate != "" {
+		return &bookPb.ReturnBookResponse{Message: "failed to return book because Book has been returned"}, err
+	}
+
 	tx, err := s.Db.Begin()
 
 	if err != nil {
@@ -211,4 +225,26 @@ func (s *Server) SearchBook(ctx context.Context, req *bookPb.SearchBookRequest) 
 	}
 
 	return &bookPb.SearchBookResponse{BookId: id, BookTitle: req.BookTitle, Stock: stock}, err
+}
+
+func (s *Server) EditBookStock(ctx context.Context, req *bookPb.EditBookStockRequest) (resp *bookPb.EditBookStockResponse, err error) {
+	var bookId string
+	var stock int
+	row := s.Db.QueryRow(GET_BOOK_DATA_BY_TITLE_QUERY, req.Title)
+
+	err = row.Scan(&bookId, &stock)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = s.Db.Exec(UPDATE_BOOK_STOCK_QUERY, req.Stock, bookId)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	return &bookPb.EditBookStockResponse{Message: "Success update book stock"}, err
 }

@@ -11,6 +11,7 @@ service Book {
   rpc GetBookIdByTitle (GetBookIdByTitleRequest) returns (GetBookIdByTitleResponse);
   rpc RecommendBook (RecommendBookRequest) returns (RecommendBookResponse);
   rpc SearchBook (SearchBookRequest) returns (SearchBookResponse);
+  rpc EditBookStock (EditBookStockRequest) returns (EditBookStockResponse);
 }
 
 message InsertBookRequest {
@@ -65,4 +66,13 @@ message SearchBookResponse {
   string BookTitle = 2;
   int32 Stock = 3;
   string Message = 4;
+}
+
+message EditBookStockRequest {
+  string title = 1;
+  int32 stock = 2;
+}
+
+message EditBookStockResponse {
+  string message = 1;
 }
