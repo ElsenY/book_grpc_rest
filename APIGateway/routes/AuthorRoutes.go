@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"APIGateway/middleware"
 	authorPb "APIGateway/pb/AuthorService"
 	"net/http"
 
@@ -21,7 +22,11 @@ func RegisterAuthorRoute(mainRoute *gin.Engine, authorConn *grpc.ClientConn) *gi
 		client: authorClient,
 	}
 
-	mainRoute.POST("/author", authorRoute.RegisterUserAsAuthor)
+	protectedAuthor := mainRoute.Group("/authors/protected")
+
+	protectedAuthor.Use(middleware.AuthMiddleware())
+
+	protectedAuthor.POST("/author", authorRoute.RegisterUserAsAuthor)
 
 	return mainRoute
 }

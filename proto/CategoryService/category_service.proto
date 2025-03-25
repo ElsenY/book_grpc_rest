@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package categorypb;
+
+option go_package = "pb/CategoryService";
+
+service Book {
+  rpc InsertCategory (InsertCategoryRequest) returns (InsertBookResponse);
+}
+
+message InsertCategoryRequest {
+  string Name = 1;
+  string BookId = 2;
+}
+
+message InsertBookResponse {
+  string message = 1;
+}
+
+message BorrowBookRequest {
+  string Title = 1;
+  string BorrowerEmail = 2;
+}
+
+message BorrowBookResponse {
+  string message = 1;
+}
+
+message ReturnBookRequest {
+  string Title = 1;
+  string ReturnerEmail = 2;
+}
+
+message ReturnBookResponse {
+  string message = 1;
+}

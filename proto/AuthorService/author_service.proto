@@ -6,11 +6,21 @@ option go_package = "pb/AuthorService";
 
 service Author {
   rpc RegisterUserAsAuthor (RegisterUserAsAuthorRequest) returns (RegisterUserAsAuthorResponse);
+  rpc GetAuthorIdByUserId (GetAuthorIdByUserIdRequest) returns (GetAuthorIdByUserIdResponse);
 }
 
 message RegisterUserAsAuthorRequest {
+  string userEmail = 1;
 }
 
 message RegisterUserAsAuthorResponse {
   string message = 1;
+}
+
+message GetAuthorIdByUserIdRequest{
+  string user_id = 1;
+}
+
+message GetAuthorIdByUserIdResponse{
+  string author_id = 1;
 }
