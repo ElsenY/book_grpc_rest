@@ -22,6 +22,8 @@ func RegisterBookRoute(mainRoute *gin.Engine, bookConn *grpc.ClientConn) *gin.En
 		client: bookClient,
 	}
 
+	mainRoute.GET("/books/recommend-book", bookRoute.RecommendBook)
+	mainRoute.GET("/books/search-book", bookRoute.SearchBook)
 	protectedBooks := mainRoute.Group("/books/protected")
 
 	protectedBooks.Use(middleware.AuthMiddleware())
@@ -110,5 +112,48 @@ func (br BookRoute) ReturnBook(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": res.Message,
+	})
+}
+
+func (br BookRoute) RecommendBook(c *gin.Context) {
+	var reqBody bookPb.RecommendBookRequest
+
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := br.client.RecommendBook(c, &bookPb.RecommendBookRequest{})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": res.BookTitle,
+	})
+}
+
+func (br BookRoute) SearchBook(c *gin.Context) {
+	var reqBody bookPb.SearchBookRequest
+
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := br.client.SearchBook(c, &bookPb.SearchBookRequest{BookTitle: reqBody.BookTitle})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"book_id":    res.BookId,
+		"book_title": res.BookTitle,
+		"stock":      res.Stock,
+		"message":    res.Message,
 	})
 }

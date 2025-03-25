@@ -16,7 +16,7 @@ func main() {
 	userConn, err := ConnectUserService()
 
 	if err != nil {
-		fmt.Println("failed to connect to user service")
+		fmt.Println("failed to connect to User service", err)
 	}
 
 	defer userConn.Close()
@@ -24,7 +24,7 @@ func main() {
 	authorConn, err := ConnectAuthorService()
 
 	if err != nil {
-		fmt.Println("failed to connect to user service")
+		fmt.Println("failed to connect to Author service", err)
 	}
 
 	defer userConn.Close()
@@ -32,7 +32,7 @@ func main() {
 	bookConn, err := ConnectBookService()
 
 	if err != nil {
-		fmt.Println("failed to connect to user service")
+		fmt.Println("failed to connect to Book service", err)
 	}
 
 	defer bookConn.Close()
@@ -40,7 +40,7 @@ func main() {
 	categoryConn, err := ConnectCategoryService()
 
 	if err != nil {
-		fmt.Println("failed to connect to user service")
+		fmt.Println("failed to connect to Category service", err)
 	}
 
 	defer categoryConn.Close()

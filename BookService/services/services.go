@@ -6,6 +6,7 @@ import (
 	userPb "BookService/pb/UserService"
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -173,4 +174,41 @@ func (s *Server) GetBookIdByTitle(ctx context.Context, req *bookPb.GetBookIdByTi
 	}
 
 	return &bookPb.GetBookIdByTitleResponse{BookId: bookId}, err
+}
+
+// recommend book that has been borrowed the most
+func (s *Server) RecommendBook(ctx context.Context, req *bookPb.RecommendBookRequest) (resp *bookPb.RecommendBookResponse, err error) {
+
+	var bookTitle string
+	var borrowCount int
+	row := s.Db.QueryRow(GET_MOST_BORROWED_BOOK_QUERY)
+
+	err = row.Scan(&bookTitle, &borrowCount)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	return &bookPb.RecommendBookResponse{BookTitle: fmt.Sprintf("Recommend %s, has been borrowed the most %d", bookTitle, borrowCount)}, err
+}
+
+func (s *Server) SearchBook(ctx context.Context, req *bookPb.SearchBookRequest) (resp *bookPb.SearchBookResponse, err error) {
+
+	var id string
+	var stock int32
+	row := s.Db.QueryRow(GET_BOOK_DATA_BY_TITLE_QUERY, req.BookTitle)
+
+	err = row.Scan(&id, &stock)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return &bookPb.SearchBookResponse{Message: "No book with the provided title found!"}, nil
+		}
+
+		log.Println(err)
+		return
+	}
+
+	return &bookPb.SearchBookResponse{BookId: id, BookTitle: req.BookTitle, Stock: stock}, err
 }
