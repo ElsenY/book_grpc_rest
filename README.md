@@ -46,5 +46,8 @@ most of the routes are protected routes, so first thing we need to create user, 
 # DockerHub Images
 https://hub.docker.com/repository/docker/elseny/book/general
 
+# Deployment
+sadly, I cannot deploy the app live to AWS/GCP/Heroku since AWS and GCP need credit card info to acces the free tier (which I don't have), and Heroku does not offer free tier anymore
+
 
 
