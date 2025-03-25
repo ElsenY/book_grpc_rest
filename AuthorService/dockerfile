@@ -1,0 +1,6 @@
+FROM golang:1.24.1
+WORKDIR /app/author-service
+COPY . .
+RUN go mod tidy
+RUN go build -o author-service main.go
+CMD ["/app/author-service/author-service"]

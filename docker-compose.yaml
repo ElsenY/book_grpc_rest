@@ -1,0 +1,75 @@
+services:
+  user-service:
+    build: ./UserService
+    container_name: user-service
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@host.docker.internal:5432/database?sslmode=disable
+      JWT_SECRET_KEY: "testkey123" # should be put in .env file but for simplicity, going to put it here first
+    ports:
+      - "50051:50051"
+
+  author-service:
+    build: ./AuthorService
+    container_name: author-service
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@host.docker.internal:5432/database?sslmode=disable
+      USER_SERVICE_URL: "host.docker.internal:50051"
+    ports:
+      - "50052:50052"
+      
+  book-service:
+    build: ./BookService
+    container_name: book-service
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@host.docker.internal:5432/database?sslmode=disable
+      USER_SERVICE_URL: "host.docker.internal:50051"
+      AUTHOR_SERVICE_URL: "host.docker.internal:50052"
+    ports:
+      - "50053:50053"
+
+  category-service:
+    build: ./CategoryService
+    container_name: category-service
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@host.docker.internal:5432/database?sslmode=disable
+      BOOK_SERVICE_URL: "host.docker.internal:50053"
+    ports:
+      - "50054:50054"
+
+  api-gateway:
+    build: ./APIGateway
+    container_name: api-gateway
+    environment:
+      USER_SERVICE_URL: "host.docker.internal:50051"
+      AUTHOR_SERVICE_URL: "host.docker.internal:50052"
+      BOOK_SERVICE_URL: "host.docker.internal:50053"
+      CATEGORY_SERVICE_URL: "host.docker.internal:50054"
+      JWT_SECRET_KEY: "testkey123" # should be put in .env file but for simplicity, going to put it here first
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-service
+      - author-service
+      - book-service
+      - category-service
+  db:
+    platform: linux/x86_64
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: database
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+volumes:
+  db:
+    driver: local

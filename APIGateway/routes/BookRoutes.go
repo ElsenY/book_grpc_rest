@@ -117,13 +117,6 @@ func (br BookRoute) ReturnBook(c *gin.Context) {
 }
 
 func (br BookRoute) RecommendBook(c *gin.Context) {
-	var reqBody bookPb.RecommendBookRequest
-
-	if err := c.ShouldBindJSON(&reqBody); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	res, err := br.client.RecommendBook(c, &bookPb.RecommendBookRequest{})
 
 	if err != nil {

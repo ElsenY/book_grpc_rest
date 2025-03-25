@@ -54,7 +54,6 @@ func main() {
 }
 
 func InitDb() *sql.DB {
-	os.Setenv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
 	dbDsn := os.Getenv("DATABASE_URL")
 
 	db, err := sql.Open("postgres", dbDsn)
@@ -66,13 +65,13 @@ func InitDb() *sql.DB {
 }
 
 func ConnectAuthorService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("AUTHOR_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }
 
 func ConnectUserService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("USER_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }

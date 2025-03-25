@@ -3,6 +3,7 @@ package main
 import (
 	"APIGateway/routes"
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -55,25 +56,25 @@ func main() {
 }
 
 func ConnectUserService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("USER_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }
 
 func ConnectAuthorService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("AUTHOR_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }
 
 func ConnectBookService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("BOOK_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }
 
 func ConnectCategoryService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50054", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("CATEGORY_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }

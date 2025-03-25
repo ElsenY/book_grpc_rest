@@ -44,7 +44,6 @@ func main() {
 }
 
 func InitDb() *sql.DB {
-	os.Setenv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
 	dbDsn := os.Getenv("DATABASE_URL")
 
 	db, err := sql.Open("postgres", dbDsn)
@@ -56,7 +55,7 @@ func InitDb() *sql.DB {
 }
 
 func ConnectBookService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("BOOK_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }

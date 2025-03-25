@@ -14,10 +14,6 @@ import (
 )
 
 func main() {
-
-	// TODO : remove the secret from code!
-	os.Setenv("JWT_SECRET_KEY", "test123")
-
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
@@ -35,7 +31,6 @@ func main() {
 }
 
 func InitDb() *sql.DB {
-	os.Setenv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
 	dbDsn := os.Getenv("DATABASE_URL")
 
 	db, err := sql.Open("postgres", dbDsn)

@@ -17,9 +17,6 @@ import (
 )
 
 func main() {
-	// TODO : remove the secret from code!
-	os.Setenv("JWT_SECRET_KEY", "test123")
-
 	lis, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
@@ -47,7 +44,6 @@ func main() {
 }
 
 func InitDb() *sql.DB {
-	os.Setenv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
 	dbDsn := os.Getenv("DATABASE_URL")
 
 	db, err := sql.Open("postgres", dbDsn)
@@ -59,7 +55,7 @@ func InitDb() *sql.DB {
 }
 
 func ConnectUserService() (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(os.Getenv("USER_SERVICE_URL"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }

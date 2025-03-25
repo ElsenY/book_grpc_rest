@@ -1,0 +1,6 @@
+FROM golang:1.24.1
+WORKDIR /app/category-service
+COPY . .
+RUN go mod tidy
+RUN go build -o category-service main.go
+CMD ["/app/category-service/category-service"]

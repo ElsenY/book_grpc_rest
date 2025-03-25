@@ -13,7 +13,6 @@ func AuthMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		// TODO: REMOVE SECRET FROM ENV
-		os.Setenv("JWT_SECRET_KEY", "test123")
 
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

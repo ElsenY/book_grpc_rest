@@ -118,7 +118,7 @@ func (s *Server) ReturnBook(ctx context.Context, req *bookPb.ReturnBookRequest) 
 		return
 	}
 
-	var returnDate string
+	var returnDate sql.NullTime
 	row = s.Db.QueryRow(CHECK_BOOK_RETURNED_QUERY, userResp.Id, bookId)
 
 	err = row.Scan(&returnDate)
@@ -128,7 +128,7 @@ func (s *Server) ReturnBook(ctx context.Context, req *bookPb.ReturnBookRequest) 
 		return
 	}
 
-	if returnDate != "" {
+	if returnDate.Valid {
 		return &bookPb.ReturnBookResponse{Message: "failed to return book because Book has been returned"}, err
 	}
 
