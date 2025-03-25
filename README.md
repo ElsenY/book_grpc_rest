@@ -9,7 +9,8 @@ A library like app which use REST API as API Gateway, which use GRPC to calls mi
 4. run `docker compose down --volumes` to stop the app from running and delete database volumes too
 
 # ERD 
-<img width="746" alt="image" src="https://github.com/user-attachments/assets/f517f9a2-9eef-49c1-a3f6-2b07b3af7260" />
+<img width="685" alt="image" src="https://github.com/user-attachments/assets/2f91cb32-81a3-4d65-9f26-b667a8f1a7ed" />
+
 
 # API Route
 for the sake of simplicity, I have made the API route in postman [here](https://www.postman.com/maintenance-architect-99534403/elsen-public/collection/f5sz855/synapsis-book) and will explain the walkthrough based on this postman API collection
