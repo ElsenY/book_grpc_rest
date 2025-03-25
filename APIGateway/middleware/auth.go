@@ -12,6 +12,7 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+		// TODO: REMOVE SECRET FROM ENV
 		os.Setenv("JWT_SECRET_KEY", "test123")
 
 		authHeader := c.GetHeader("Authorization")
@@ -46,7 +47,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Continue to the next middleware/handler
 		c.Next()
 	}
 }

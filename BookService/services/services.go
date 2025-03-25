@@ -7,8 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"log"
-
-	"github.com/golang-jwt/jwt"
 )
 
 type Server struct {
@@ -16,11 +14,6 @@ type Server struct {
 	AuthorClient authorPb.AuthorClient
 	UserClient   userPb.UserClient
 	Db           *sql.DB
-}
-
-type Claims struct {
-	Email string `json:"email"`
-	jwt.StandardClaims
 }
 
 func (s *Server) InsertBook(ctx context.Context, req *bookPb.InsertBookRequest) (resp *bookPb.InsertBookResponse, err error) {
@@ -164,4 +157,20 @@ func (s *Server) ReturnBook(ctx context.Context, req *bookPb.ReturnBookRequest) 
 	}
 
 	return &bookPb.ReturnBookResponse{Message: "Success return book"}, err
+}
+
+func (s *Server) GetBookIdByTitle(ctx context.Context, req *bookPb.GetBookIdByTitleRequest) (resp *bookPb.GetBookIdByTitleResponse, err error) {
+
+	var bookId string
+	var stock int
+	row := s.Db.QueryRow(GET_BOOK_DATA_BY_TITLE_QUERY, req.Title)
+
+	err = row.Scan(&bookId, &stock)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	return &bookPb.GetBookIdByTitleResponse{BookId: bookId}, err
 }

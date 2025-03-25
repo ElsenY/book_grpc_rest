@@ -8,6 +8,7 @@ service Book {
   rpc InsertBook (InsertBookRequest) returns (InsertBookResponse);
   rpc BorrowBook (BorrowBookRequest) returns (BorrowBookResponse);
   rpc ReturnBook (ReturnBookRequest) returns (ReturnBookResponse);
+  rpc GetBookIdByTitle (GetBookIdByTitleRequest) returns (GetBookIdByTitleResponse);
 }
 
 message InsertBookRequest {
@@ -37,3 +38,12 @@ message ReturnBookRequest {
 message ReturnBookResponse {
   string message = 1;
 }
+
+message GetBookIdByTitleRequest {
+  string Title = 1;
+}
+
+message GetBookIdByTitleResponse {
+  string bookId = 1;
+}
+

@@ -18,9 +18,6 @@ import (
 )
 
 func main() {
-	// TODO : remove the secret from code!
-	os.Setenv("JWT_SECRET_KEY", "test123")
-
 	lis, err := net.Listen("tcp", ":50053")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)

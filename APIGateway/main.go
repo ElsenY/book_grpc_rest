@@ -35,11 +35,20 @@ func main() {
 		fmt.Println("failed to connect to user service")
 	}
 
-	defer userConn.Close()
+	defer bookConn.Close()
+
+	categoryConn, err := ConnectCategoryService()
+
+	if err != nil {
+		fmt.Println("failed to connect to user service")
+	}
+
+	defer categoryConn.Close()
 
 	routes.RegisterUserRoutes(router, userConn)
 	routes.RegisterAuthorRoute(router, authorConn)
 	routes.RegisterBookRoute(router, bookConn)
+	routes.RegisterCategoryRoute(router, categoryConn)
 
 	fmt.Println("API Gateway running on port 8080")
 	router.Run(":8080")
@@ -59,6 +68,12 @@ func ConnectAuthorService() (*grpc.ClientConn, error) {
 
 func ConnectBookService() (*grpc.ClientConn, error) {
 	conn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	return conn, err
+}
+
+func ConnectCategoryService() (*grpc.ClientConn, error) {
+	conn, err := grpc.NewClient("localhost:50054", grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	return conn, err
 }
